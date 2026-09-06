@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "385566103457",
+    "project_id": "minova-ef69c",
+    "storage_bucket": "minova-ef69c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:385566103457:android:22b6fac5cdcaa08dfd1de0",
+        "android_client_info": {
+          "package_name": "com.sih26024.minesafe.minesafe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA02NGCg3zdflJdhzwvhlGQz3x5hwpWCWQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

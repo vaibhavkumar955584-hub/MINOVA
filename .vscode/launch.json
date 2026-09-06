@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "MineSafe (Connected Cloudinary)",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=CLOUDINARY_CLOUD_NAME=krccszeo",
+        "--dart-define=CLOUDINARY_UNSIGNED_UPLOAD_PRESET=minova_mobile_demo"
+      ]
+    },
+    {
+      "name": "MineSafe (Release on Device)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "args": [
+        "--dart-define=CLOUDINARY_CLOUD_NAME=krccszeo",
+        "--dart-define=CLOUDINARY_UNSIGNED_UPLOAD_PRESET=minova_mobile_demo"
+      ]
+    }
+  ]
+}

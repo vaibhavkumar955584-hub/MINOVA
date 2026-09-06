@@ -1,0 +1,113 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function hasUserDoc() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserData() {
+      return getUserDoc().data;
+    }
+
+    function isInspectorActive() {
+      return signedIn()
+        && hasUserDoc()
+        && getUserData().get('accountStatus', 'active') == 'active';
+    }
+
+    function mineAssigned(mineId) {
+      return signedIn()
+        && isInspectorActive()
+        && (
+          (getUserData().get('assignedMineIds', []) is list && getUserData().get('assignedMineIds', []).hasAny([mineId])) ||
+          getUserData().get('assignedMineId', '') == mineId ||
+          getUserData().get('mine_id', '') == mineId ||
+          getUserData().get('mine_assigned', '') == mineId
+        );
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update, delete: if false;
+    }
+
+    function canCreateReport() {
+      return signedIn()
+        && mineAssigned(request.resource.data.mine_id)
+        && (
+          request.resource.data.get('user_id', request.auth.uid) == request.auth.uid &&
+          request.resource.data.get('inspector_id', request.auth.uid) == request.auth.uid &&
+          request.resource.data.get('reporter_id', request.auth.uid) == request.auth.uid
+        );
+    }
+
+    function canUpdateReport() {
+      return signedIn()
+        && mineAssigned(resource.data.mine_id)
+        && (
+          resource.data.get('user_id', request.auth.uid) == request.auth.uid ||
+          resource.data.get('inspector_id', request.auth.uid) == request.auth.uid ||
+          resource.data.get('reporter_id', request.auth.uid) == request.auth.uid
+        );
+    }
+
+    function canReadReport() {
+      return signedIn()
+        && (
+          resource.data.get('user_id', null) == request.auth.uid ||
+          resource.data.get('inspector_id', null) == request.auth.uid ||
+          resource.data.get('reporter_id', null) == request.auth.uid ||
+          mineAssigned(resource.data.mine_id)
+        );
+    }
+
+    match /inspections/{reportId} {
+      allow create: if canCreateReport();
+      allow update: if canUpdateReport();
+      allow read: if canReadReport();
+    }
+    match /incidents/{reportId} {
+      allow create: if canCreateReport();
+      allow update: if canUpdateReport();
+      allow read: if canReadReport();
+    }
+    match /attendance/{reportId} {
+      allow create: if canCreateReport();
+      allow update: if canUpdateReport();
+      allow read: if canReadReport();
+    }
+    match /observations/{reportId} {
+      allow create: if canCreateReport();
+      allow update: if canUpdateReport();
+      allow read: if canReadReport();
+    }
+    match /grievances/{reportId} {
+      allow create: if canCreateReport();
+      allow update: if canUpdateReport();
+      allow read: if canReadReport();
+    }
+    match /documents/{reportId} {
+      allow create: if canCreateReport();
+      allow update: if canUpdateReport();
+      allow read: if canReadReport();
+    }
+
+    match /correctionRequests/{requestId} {
+      allow create: if signedIn()
+        && request.resource.data.requestedByUserId == request.auth.uid;
+      allow read: if signedIn()
+        && resource.data.requestedByUserId == request.auth.uid;
+      allow update: if signedIn()
+        && resource.data.requestedByUserId == request.auth.uid
+        && resource.data.status == 'pendingReview';
+    }
+  }
+}
