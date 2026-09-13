@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="emergency_incident"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_incident"
+        android:shortcutShortLabel="@string/shortcut_emergency_incident"
+        android:shortcutLongLabel="@string/shortcut_emergency_incident">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.sih26024.minesafe.minesafe"
+            android:targetClass="com.sih26024.minesafe.minesafe.MainActivity"
+            android:data="minova://shortcut/emergency_incident" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="attendance"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_attendance"
+        android:shortcutShortLabel="@string/shortcut_attendance"
+        android:shortcutLongLabel="@string/shortcut_attendance">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.sih26024.minesafe.minesafe"
+            android:targetClass="com.sih26024.minesafe.minesafe.MainActivity"
+            android:data="minova://shortcut/attendance" />
+    </shortcut>
+</shortcuts>

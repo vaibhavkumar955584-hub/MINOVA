@@ -11,6 +11,8 @@ import '../../models/inspection_model.dart';
 import '../../models/observation_model.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/minova_logo.dart';
+import '../auth/language_selection_screen.dart';
+import '../profile/profile_screen.dart';
 import 'record_detail_screen.dart';
 
 enum RecordsFilterTab { all, waiting, sent }
@@ -180,64 +182,116 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                         ],
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardLayer1,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.primaryAmber.withAlpha(80),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.language_rounded,
-                            size: 13,
-                            color: AppColors.primaryAmber,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            language.nativeName,
-                            style: AppTypography.labelSm.copyWith(
-                              color: AppColors.primaryAmber,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
+                    // 1. Language Selector Button
+                    Tooltip(
+                      message: 'Change Language / भाषा बदलें',
+                      child: Material(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        child: InkWell(
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const LanguageSelectionScreen(),
                             ),
                           ),
-                        ],
+                          borderRadius: BorderRadius.circular(20),
+                          splashColor: AppColors.primaryAmber.withAlpha(50),
+                          highlightColor: AppColors.primaryAmber.withAlpha(30),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.cardLayer1,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: AppColors.primaryAmber.withAlpha(90),
+                                width: 1.2,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.language_rounded,
+                                  size: 14,
+                                  color: AppColors.primaryAmber,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  language.nativeName,
+                                  style: AppTypography.labelSm.copyWith(
+                                    color: AppColors.primaryAmber,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                const Icon(
+                                  Icons.arrow_drop_down_rounded,
+                                  size: 16,
+                                  color: AppColors.primaryAmber,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            AppColors.primaryAmberDark,
-                            AppColors.secondaryOrange,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primaryAmberDark.withAlpha(40),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
+
+                    // 2. Profile Avatar Button
+                    Tooltip(
+                      message: (user != null && user.fullName.isNotEmpty)
+                          ? 'Profile: ${user.fullName}'
+                          : 'Inspector Profile',
+                      child: Material(
+                        color: Colors.transparent,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const ProfileScreen(),
+                            ),
                           ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        color: Colors.white,
-                        size: 20,
+                          customBorder: const CircleBorder(),
+                          splashColor: AppColors.primaryAmber.withAlpha(80),
+                          child: Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.primaryAmberDark,
+                                  AppColors.secondaryOrange,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primaryAmberDark.withAlpha(60),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                (user != null && user.fullName.isNotEmpty)
+                                    ? user.fullName.trim().substring(0, 1).toUpperCase()
+                                    : 'I',
+                                style: AppTypography.labelMd.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],

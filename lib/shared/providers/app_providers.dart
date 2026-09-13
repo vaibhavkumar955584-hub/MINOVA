@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import '../../core/ai/document_ocr_service.dart';
 import '../../core/ai/gemini_copilot_service.dart';
+import '../../core/auth/app_security_state.dart';
+import '../../core/auth/app_session_coordinator.dart';
 import '../../core/auth/biometric_service.dart';
 import '../../core/auth/auth_service.dart';
 import '../../core/auth/firebase_auth_service.dart';
@@ -229,6 +231,14 @@ class AuthNotifier extends StateNotifier<UserModel?> {
 }
 
 final sessionUnlockedProvider = StateProvider<bool>((ref) => false);
+
+final appSessionCoordinatorProvider =
+    StateNotifierProvider<AppSessionCoordinator, AppSecuritySnapshot>((ref) {
+  return AppSessionCoordinator(
+    mpinService: ref.watch(mpinServiceProvider),
+    biometricService: ref.watch(biometricServiceProvider),
+  );
+});
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, UserModel?>((
   ref,

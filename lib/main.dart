@@ -10,12 +10,9 @@ import 'core/localization/generated/app_localizations.dart';
 import 'core/firebase/firebase_bootstrap.dart';
 import 'core/notifications/notification_service.dart';
 import 'core/sync/background_sync_service.dart';
-import 'core/auth/secure_storage.dart';
+import 'core/shortcuts/launcher_shortcut_service.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/login_screen.dart';
-import 'features/auth/language_selection_screen.dart';
-import 'features/auth/local_security_gate.dart';
-import 'features/shell/main_navigation_shell.dart';
+import 'features/splash/splash_screen.dart';
 import 'shared/providers/app_providers.dart';
 
 Future<void> main() async {
@@ -69,62 +66,34 @@ class MineSafeApp extends ConsumerStatefulWidget {
 }
 
 class _MineSafeAppState extends ConsumerState<MineSafeApp> {
-  bool _isCheckingSession = true;
-  bool _isSessionUnlocked = false;
+  late final WidgetsBindingObserver _coordinator;
 
   @override
   void initState() {
     super.initState();
-    _checkSavedSession();
+    _coordinator = ref.read(appSessionCoordinatorProvider.notifier);
+    WidgetsBinding.instance.addObserver(_coordinator);
+    LauncherShortcutService.instance.initialize(ref);
   }
 
-  Future<void> _checkSavedSession() async {
-    try {
-      await ref.read(authStateProvider.notifier).restoreSession();
-      final isUnlocked = await SecureTokenStorage.instance.isSessionUnlocked();
-      if (mounted) {
-        setState(() {
-          _isSessionUnlocked = isUnlocked;
-        });
-      }
-      if (isUnlocked) {
-        ref.read(sessionUnlockedProvider.notifier).state = true;
-      }
-    } catch (_) {
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isCheckingSession = false;
-        });
-      }
-    }
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(_coordinator);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authStateProvider);
-    final isUnlocked = ref.watch(sessionUnlockedProvider) || _isSessionUnlocked;
-
     return MaterialApp(
+      navigatorKey: LauncherShortcutService.navigatorKey,
       title: 'MINOVA',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       locale: ref.watch(languageControllerProvider).language.locale,
       supportedLocales: AppLanguage.all.map((language) => language.locale),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      home: _isCheckingSession
-          ? const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(color: Color(0xFFF59E0B)),
-              ),
-            )
-          : (!ref.watch(languageControllerProvider).hasSelection
-                ? const LanguageSelectionScreen()
-                : (user != null
-                      ? (isUnlocked
-                            ? const MainNavigationShell()
-                            : const LocalSecurityGate())
-                      : const LoginScreen())),
+      home: const SplashScreen(),
     );
   }
 }
+

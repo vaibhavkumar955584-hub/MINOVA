@@ -214,6 +214,15 @@ class InspectionRepository {
   }
 
   void _validateForSubmission(InspectionReport report) {
+    if (report.clientUuid.trim().isEmpty) {
+      throw const FormatException('Missing required submission identity.');
+    }
+    if (report.mineId.trim().isEmpty) {
+      throw const FormatException('Missing required mine identifier.');
+    }
+    if (report.userId.trim().isEmpty) {
+      throw const FormatException('Missing required inspector identifier.');
+    }
     if (report.checklist.isEmpty ||
         report.checklist.any(
           (item) => item.status == CheckItemStatus.unanswered,
@@ -221,17 +230,6 @@ class InspectionRepository {
       throw const FormatException(
         'Complete every checklist item before submitting.',
       );
-    }
-    for (final item in report.checklist) {
-      if (item.status != CheckItemStatus.fail) continue;
-      if (item.severity == null ||
-          item.violationDescription?.trim().isEmpty != false ||
-          item.correctiveAction?.trim().isEmpty != false ||
-          item.deadline == null) {
-        throw const FormatException(
-          'Complete severity, violation, corrective action, and deadline for every failed item.',
-        );
-      }
     }
     if (report.signatureBase64 == null || report.signatureBase64!.trim().isEmpty) {
       throw const FormatException('Please add your signature before submitting.');

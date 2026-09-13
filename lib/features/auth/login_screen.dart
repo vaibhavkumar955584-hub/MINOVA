@@ -6,7 +6,8 @@ import '../../core/theme/app_typography.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/minova_logo.dart';
 import 'language_selection_screen.dart';
-import 'local_security_gate.dart';
+import 'setup_security_screen.dart';
+import 'unlock_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -32,9 +33,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .read(authStateProvider.notifier)
           .loginWithEmail(_emailController.text, _passwordController.text);
 
+      final isMpinConfigured =
+          await ref.read(mpinServiceProvider).isMpinConfigured();
+
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const LocalSecurityGate()),
+          MaterialPageRoute(
+            builder: (_) => isMpinConfigured
+                ? const UnlockScreen()
+                : const SetupSecurityScreen(),
+          ),
         );
       }
     } catch (e) {
