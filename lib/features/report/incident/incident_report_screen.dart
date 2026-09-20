@@ -17,7 +17,19 @@ import '../../../shared/widgets/signature_pad.dart';
 
 class IncidentReportScreen extends ConsumerStatefulWidget {
   final String? initialClientUuid;
-  const IncidentReportScreen({super.key, this.initialClientUuid});
+  final IncidentType? initialIncidentType;
+  final String? initialLocationDescription;
+  final double? initialLatitude;
+  final double? initialLongitude;
+
+  const IncidentReportScreen({
+    super.key,
+    this.initialClientUuid,
+    this.initialIncidentType,
+    this.initialLocationDescription,
+    this.initialLatitude,
+    this.initialLongitude,
+  });
 
   @override
   ConsumerState<IncidentReportScreen> createState() => _IncidentReportScreenState();
@@ -48,6 +60,9 @@ class _IncidentReportScreenState extends ConsumerState<IncidentReportScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialIncidentType != null) {
+      _selectedType = widget.initialIncidentType!;
+    }
     _submissionId = widget.initialClientUuid ??
         'INC-EMG-${const Uuid().v4().substring(0, 8).toUpperCase()}';
     _initOrRestoreDraft();
@@ -94,6 +109,9 @@ class _IncidentReportScreenState extends ConsumerState<IncidentReportScreen> {
       } else {
         _submissionId = widget.initialClientUuid ??
             'INC-EMG-${const Uuid().v4().substring(0, 8).toUpperCase()}';
+        if (widget.initialIncidentType != null) {
+          _selectedType = widget.initialIncidentType!;
+        }
       }
 
       await prefs.setString(_activeIncidentDraftKey, _submissionId);

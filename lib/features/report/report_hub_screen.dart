@@ -104,16 +104,17 @@ class ReportHubScreen extends ConsumerWidget {
               badgeColor: AppColors.hazardRed,
               onTap: () => _open(context, const IncidentReportScreen()),
             ),
-          _ReportChoice(
-            icon: Icons.people_outline,
-            title: 'Attendance & Muster Roll',
-            hindiTitle: 'उपस्थिति एवं मस्टर रोल (Form-D / Headcount)',
-            description:
-                'Underground miner headcount verification, pit muster point roll call, and contractor worker check-in.',
-            badge: 'FORM-D',
-            badgeColor: AppColors.telemetryBlue,
-            onTap: () => _open(context, const AttendanceScreen()),
-          ),
+          if (permissions?.canManageAttendance ?? true)
+            _ReportChoice(
+              icon: Icons.people_outline,
+              title: 'Attendance & Muster Roll',
+              hindiTitle: 'उपस्थिति एवं मस्टर रोल (Form-D / Headcount)',
+              description:
+                  'Underground miner headcount verification, pit muster point roll call, and contractor worker check-in.',
+              badge: 'FORM-D',
+              badgeColor: AppColors.telemetryBlue,
+              onTap: () => _open(context, const AttendanceScreen()),
+            ),
           if (permissions?.canSubmitObservation ?? true)
             _ReportChoice(
               icon: Icons.visibility_outlined,

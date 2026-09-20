@@ -23,6 +23,10 @@ import '../../repositories/incident_repository.dart';
 import '../../repositories/inspection_repository.dart';
 import '../../repositories/observation_repository.dart';
 
+import '../../core/notifications/emergency_notification_service.dart';
+import '../../models/emergency_notification_model.dart';
+import '../../models/specialist_category.dart';
+
 // Services
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 final firebaseAuthServiceProvider = Provider<FirebaseAuthService>(
@@ -53,6 +57,10 @@ final geminiCopilotServiceProvider = Provider<GeminiCopilotService>(
   (ref) => GeminiCopilotService(),
 );
 final syncEngineProvider = Provider<SyncEngine>((ref) => SyncEngine.instance);
+final emergencyNotificationServiceProvider =
+    Provider<EmergencyNotificationService>(
+  (ref) => EmergencyNotificationService.instance,
+);
 
 // Repositories
 final inspectionRepositoryProvider = Provider<InspectionRepository>(
@@ -103,6 +111,11 @@ class AuthNotifier extends StateNotifier<UserModel?> {
     if (_firebaseAuth != null && _firebaseAuthService.isAvailable) {
       final firebaseUser = _firebaseAuthService.currentUser;
       if (firebaseUser == null) {
+        final localUser = await _authService.restoreSession();
+        if (localUser != null && localUser.role == UserRole.employee) {
+          state = localUser;
+          return;
+        }
         await _authService.logout();
         state = null;
         return;
@@ -111,6 +124,11 @@ class AuthNotifier extends StateNotifier<UserModel?> {
         firebaseUser.uid,
       );
       if (profile == null) {
+        final localUser = await _authService.restoreSession();
+        if (localUser != null && localUser.role == UserRole.employee) {
+          state = localUser;
+          return;
+        }
         await _authService.logout();
         state = null;
         return;
@@ -153,6 +171,25 @@ class AuthNotifier extends StateNotifier<UserModel?> {
     final user = await _authService.login(
       employeeId: employeeId,
       password: password,
+    );
+    state = user;
+  }
+
+  Future<void> loginEmployee({
+    required String fullName,
+    String? employeeId,
+    required String mineId,
+    required String mineName,
+    required SpecialistCategory specialist,
+    String preferredLanguage = 'en',
+  }) async {
+    final user = await _authService.loginEmployee(
+      fullName: fullName,
+      employeeId: employeeId,
+      mineId: mineId,
+      mineName: mineName,
+      specialistCategory: specialist.displayName,
+      preferredLanguage: preferredLanguage,
     );
     state = user;
   }
@@ -271,4 +308,12 @@ final pendingSyncCountProvider = StreamProvider<int>((ref) async* {
   await for (final _ in syncEngine.onSyncEvents) {
     yield await syncEngine.getPendingSyncCount();
   }
+});
+
+// Emergency Broadcasts Stream Provider
+final emergencyNotificationsStreamProvider =
+    StreamProvider<List<EmergencyNotificationModel>>((ref) {
+  final service = ref.watch(emergencyNotificationServiceProvider);
+  service.initialize();
+  return service.notificationsStream;
 });

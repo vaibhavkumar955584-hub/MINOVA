@@ -1,4 +1,4 @@
-enum UserRole { inspector, contractor, mineOfficial }
+enum UserRole { inspector, contractor, mineOfficial, employee }
 
 extension UserRoleExtension on UserRole {
   String get value {
@@ -9,6 +9,8 @@ extension UserRoleExtension on UserRole {
         return 'contractor';
       case UserRole.mineOfficial:
         return 'mine_official';
+      case UserRole.employee:
+        return 'employee';
     }
   }
 
@@ -16,6 +18,10 @@ extension UserRoleExtension on UserRole {
     switch (role.toLowerCase()) {
       case 'inspector':
         return UserRole.inspector;
+      case 'employee':
+      case 'field_responder':
+      case 'worker':
+        return UserRole.employee;
       case 'contractor':
         return UserRole.contractor;
       case 'mine_official':
@@ -28,6 +34,8 @@ extension UserRoleExtension on UserRole {
     switch (this) {
       case UserRole.inspector:
         return 'Inspector';
+      case UserRole.employee:
+        return 'Field Responder';
       case UserRole.contractor:
         return 'Contractor';
       case UserRole.mineOfficial:

@@ -175,6 +175,41 @@ class AuthService {
     await _secureStorage.clearSession();
   }
 
+  Future<UserModel> loginEmployee({
+    required String fullName,
+    String? employeeId,
+    required String mineId,
+    required String mineName,
+    required String specialistCategory,
+    String preferredLanguage = 'en',
+  }) async {
+    final cleanName = fullName.trim();
+    final cleanId = (employeeId != null && employeeId.trim().isNotEmpty)
+        ? employeeId.trim().toUpperCase()
+        : 'EMP-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+    final uid =
+        'usr_emp_${cleanName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_').toLowerCase()}_${DateTime.now().millisecondsSinceEpoch % 10000}';
+
+    final user = UserModel(
+      id: uid,
+      employeeId: cleanId,
+      fullName: cleanName,
+      role: UserRole.employee,
+      designation: specialistCategory,
+      assignedMineId: mineId,
+      assignedMineName: mineName,
+      assignedMineIds: [mineId],
+      preferredLanguage: preferredLanguage,
+      accountStatus: 'active',
+    );
+
+    await setAuthenticatedUser(
+      user: user,
+      token: 'employee_mvp_$uid',
+    );
+    return user;
+  }
+
   void switchUser(UserModel user) {
     _currentUser = user;
     _currentPermissions = RolePermissions.forUser(user);

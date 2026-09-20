@@ -10,7 +10,7 @@ import '../../core/theme/app_typography.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/minova_logo.dart';
 import '../auth/language_selection_screen.dart';
-import '../auth/login_screen.dart';
+import '../auth/role_selection_screen.dart';
 import '../auth/setup_security_screen.dart';
 import '../auth/unlock_screen.dart';
 import '../shell/main_navigation_shell.dart';
@@ -96,8 +96,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       if (kDebugMode) debugPrint('[NAV] destination=language_selection');
       destination = const LanguageSelectionScreen();
     } else if (user == null) {
-      if (kDebugMode) debugPrint('[NAV] destination=login');
-      destination = const LoginScreen();
+      if (kDebugMode) debugPrint('[NAV] destination=role_selection');
+      destination = const RoleSelectionScreen();
     } else if (user.accountStatus.toLowerCase() != 'active') {
       if (kDebugMode) debugPrint('[NAV] destination=inactive_account');
       destination = const InactiveAccountScreen();
@@ -263,7 +263,7 @@ class InactiveAccountScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Your inspector account is currently inactive or lacks mine authorization.\nPlease contact your mine safety manager or DGMS administrator.',
+                'Your account is currently inactive or lacks mine authorization.\nPlease contact your mine safety manager or DGMS administrator.',
                 textAlign: TextAlign.center,
                 style: AppTypography.bodyMd.copyWith(
                   color: AppColors.textMediumEmphasis,

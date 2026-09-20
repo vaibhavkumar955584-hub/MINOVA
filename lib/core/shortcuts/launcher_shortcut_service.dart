@@ -8,6 +8,7 @@ import '../../features/auth/setup_security_screen.dart';
 import '../../features/auth/unlock_screen.dart';
 import '../../features/report/attendance/attendance_screen.dart';
 import '../../features/report/incident/incident_report_screen.dart';
+import '../../models/user_model.dart';
 import '../../shared/providers/app_providers.dart';
 import '../auth/app_security_state.dart';
 
@@ -186,6 +187,26 @@ class LauncherShortcutService {
       debugPrint('[SHORTCUT] security=unlocked');
     }
 
+    // Role check: Employee cannot access Attendance shortcut
+    if (user.role == UserRole.employee && shortcut == LauncherShortcut.attendance) {
+      if (kDebugMode) {
+        debugPrint('[SHORTCUT] security=blocked (employee cannot access attendance)');
+      }
+      _pendingShortcut = null;
+      final navState = navigatorKey.currentState;
+      if (navState != null && navState.context.mounted) {
+        ScaffoldMessenger.of(navState.context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Attendance muster is restricted to statutory inspectors & supervisors.\nउपस्थिति प्रबंधन केवल निरीक्षकों के लिए अनुमत है।',
+            ),
+            backgroundColor: Color(0xFFEF4444),
+          ),
+        );
+      }
+      return;
+    }
+
     _pendingShortcut = null;
     _navigateToDestination(shortcut);
   }
@@ -220,6 +241,14 @@ class LauncherShortcutService {
     if (user != null && securitySnapshot.state == SecurityState.unlocked) {
       final shortcut = _pendingShortcut!;
       _pendingShortcut = null;
+
+      // Role check: Employee cannot access Attendance shortcut
+      if (user.role == UserRole.employee && shortcut == LauncherShortcut.attendance) {
+        if (kDebugMode) {
+          debugPrint('[SHORTCUT] security=blocked (employee cannot access attendance)');
+        }
+        return null;
+      }
 
       if (kDebugMode) {
         debugPrint('[SHORTCUT] destination=${shortcut.destinationName}');

@@ -32,9 +32,13 @@ class MinovaLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget emblem;
+    final assetPath = layout == MinovaLogoLayout.iconOnly
+        ? 'assets/icons/minova_emblem.png'
+        : 'assets/icons/minova_logo.png';
+
     if (useRasterAsset && theme != MinovaLogoTheme.monochrome) {
       emblem = Image.asset(
-        'assets/icons/minova_logo.png',
+        assetPath,
         width: size,
         height: size,
         fit: BoxFit.contain,

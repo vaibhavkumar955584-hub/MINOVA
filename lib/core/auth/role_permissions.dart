@@ -23,6 +23,19 @@ class RolePermissions {
     final role = user.role;
     final designation = user.designation.toLowerCase();
 
+    // 0. Employee / Field Responder
+    if (role == UserRole.employee) {
+      return const RolePermissions(
+        canPerformInspection: false,
+        canReportIncident: true,
+        canManageAttendance: false,
+        canSubmitObservation: false,
+        canUploadDocument: false,
+        canDirectlyApproveCorrections: false,
+        canRequestCorrection: false,
+      );
+    }
+
     // 1. Inspector
     if (role == UserRole.inspector) {
       return const RolePermissions(
